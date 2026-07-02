@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>比价宝 — 全网最低价一搜即得</title>
+  <meta name="description" content="一键搜索淘宝、京东、拼多多、抖音、快手商品价格，实时比价，帮你买到最低价。">
+  <style>
+    /* ── 设计变量 ───────────────────────────────────────────── */
+    :root {
+      --brand:          #FF4400;
+      --brand-hover:    #E83D00;
+      --brand-active:   #CC3700;
+      --brand-soft:     #FFF2EE;
+      --brand-orange:   #FF7A00;
+      --brand-yellow:   #FFB800;
+      --text-primary:   #1D2531;
+      --text-secondary: #657083;
+      --text-tertiary:  #9EA7B8;
+      --text-inverse:   #FFFFFF;
+      --bg-page:        #FFFFFF;
+      --bg-section:     #F7F8FA;
+      --bg-card:        #FFFFFF;
+      --gradient-hero:  linear-gradient(135deg, #FF6B35 0%, #FF4400 35%, #CC1A66 70%, #7B2FF7 100%);
+      --gradient-price: linear-gradient(90deg, #FF4400 0%, #FF7A00 100%);
+      --gradient-cta:   linear-gradient(90deg, #FF4400 0%, #FF7A00 100%);
+      --shadow-soft:    0 4px 16px rgba(255, 68, 0, .12);
+      --shadow-card:    0 8px 28px rgba(0, 0, 0, .10);
+      --shadow-float:   0 16px 48px rgba(0, 0, 0, .14);
+      --radius-card:    16px;
+      --radius-control: 12px;
+      --radius-pill:    999px;
+      --container:      1200px;
+      --font-sans:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-page);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      height: 60px;
+    }
+    .header-inner {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--brand);
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--gradient-cta);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { color: #fff; }
+    .header-tip {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .header-tip span {
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      background: var(--gradient-hero);
+      padding: 72px 0 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: var(--radius-pill);
+      padding: 6px 16px;
+      font-size: 13px;
+      color: rgba(255,255,255,.92);
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+    }
+    .hero-eyebrow .dot {
+      width: 6px; height: 6px;
+      background: #4ADE80;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .6; transform: scale(.85); }
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #FFE066 0%, #FFB800 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      font-size: 17px;
+      color: rgba(255,255,255,.82);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    /* 搜索框 */
+    .search-box {
+      max-width: 680px;
+      margin: 0 auto 28px;
+      position: relative;
+    }
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-radius: var(--radius-pill);
+      box-shadow: 0 8px 40px rgba(0,0,0,.25), 0 0 0 2px rgba(255,255,255,.3);
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+    .search-input-wrap:focus-within {
+      box-shadow: 0 8px 40px rgba(0,0,0,.35), 0 0 0 3px rgba(255,255,255,.5);
+    }
+    .search-input {
+      flex: 1;
+      height: 58px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 0 20px 0 24px;
+      color: var(--text-primary);
+      background: transparent;
+    }
+    .search-input::placeholder { color: var(--text-tertiary); }
+    .search-btn {
+      height: 58px;
+      padding: 0 28px;
+      background: var(--gradient-cta);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity .2s, transform .1s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { opacity: .92; }
+    .search-btn:active { transform: scale(.98); }
+
+    /* 平台 Chips */
+    .platform-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 0;
+    }
+    .chip-label {
+      font-size: 13px;
+      color: rgba(255,255,255,.7);
+      display: flex;
+      align-items: center;
+      margin-right: 4px;
+    }
+    /* Hero 区的 chip 样式（白色半透明，放在渐变背景上） */
+    .hero .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .18s;
+      user-select: none;
+      white-space: nowrap;
+      border: 1.5px solid rgba(255,255,255,.3);
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.85);
+    }
+    .hero .chip:hover {
+      background: rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.5);
+      color: #fff;
+    }
+    /* 结果区 chip 样式（浅色背景，放在白底上） */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .18s;
+      user-select: none;
+      white-space: nowrap;
+      border: 1.5px solid var(--border, #e5e7eb);
+      background: #fff;
+      color: var(--text-secondary);
+    }
+    .chip:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+      background: var(--brand-soft);
+    }
+    .chip.active {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(255,68,0,.25);
+    }
+
+    /* ── 结果区 ──────────────────────────────────────────────── */
+    .results-section {
+      padding: 40px 0 80px;
+      background: var(--bg-section);
+      min-height: 400px;
+    }
+
+    /* 工具栏 */
+    .results-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .results-count {
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+    .results-count strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    .sort-tabs {
+      display: flex;
+      gap: 4px;
+      background: #fff;
+      border-radius: var(--radius-pill);
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    }
+    .sort-tab {
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: all .18s;
+    }
+    .sort-tab:hover { color: var(--text-primary); }
+    .sort-tab.active {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    /* 卡片网格 */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    /* 商品卡片 */
+    .product-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: transform .22s, box-shadow .22s;
+      position: relative;
+      animation: cardIn .35s ease both;
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-float);
+    }
+
+    /* 排名徽章 */
+    .rank-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 2;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+    .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #7B3F00; }
+    .rank-2 { background: linear-gradient(135deg, #D8D8D8, #A8A8A8); color: #333; }
+    .rank-3 { background: linear-gradient(135deg, #CD7F32, #A0522D); color: #fff; }
+    .rank-n { background: rgba(0,0,0,.45); color: #fff; }
+
+    /* 平台标签 */
+    .platform-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .platform-tb  { background: #FF4400; }
+    .platform-jd  { background: #E2231A; }
+    .platform-pdd { background: #E02020; }
+    .platform-sn  { background: #0065BF; }
+    .platform-vip { background: #B5195B; }
+    .platform-kl  { background: #00A9E0; }
+    .platform-dy  { background: #000000; }
+    .platform-ks  { background: #FF4906; }
+
+    /* 商品图 */
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: #f5f5f5;
+      display: block;
+    }
+    .card-img-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+    }
+
+    /* 卡片内容 */
+    .card-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card-title {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 价格行 */
+    .card-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .price-actual {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--brand);
+      line-height: 1;
+    }
+    .price-actual .currency { font-size: 16px; }
+    .price-original {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      text-decoration: line-through;
+    }
+    .price-save {
+      font-size: 12px;
+      color: #fff;
+      background: var(--brand-orange);
+      border-radius: var(--radius-pill);
+      padding: 2px 8px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* 价格对比条 */
+    .price-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .price-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .price-bar-track {
+      height: 5px;
+      background: #F0F0F0;
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+    }
+    .price-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-pill);
+      background: var(--gradient-price);
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+    .price-bar-fill.lowest { background: linear-gradient(90deg, #22C55E, #16A34A); }
+
+    /* 标签行 */
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .tag-coupon {
+      background: #FFF2EE;
+      color: var(--brand);
+      border: 1px solid rgba(255,68,0,.2);
+    }
+    .tag-sales {
+      background: #F0FDF4;
+      color: #16A34A;
+      border: 1px solid rgba(22,163,74,.2);
+    }
+    .tag-commission {
+      background: #FFF7ED;
+      color: #EA580C;
+      border: 1px solid rgba(234,88,12,.2);
+    }
+
+    /* 操作按钮 */
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: auto;
+    }
+    .btn-buy {
+      padding: 10px 0;
+      background: var(--gradient-cta);
+      border: none;
+      border-radius: var(--radius-control);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .18s, transform .1s;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .btn-buy:hover { opacity: .9; }
+    .btn-buy:active { transform: scale(.97); }
+    .btn-copy {
+      padding: 10px 0;
+      background: transparent;
+      border: 1.5px solid var(--brand);
+      border-radius: var(--radius-control);
+      color: var(--brand);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .btn-copy:hover {
+      background: var(--brand-soft);
+    }
+    .btn-copy.copied {
+      background: #F0FDF4;
+      border-color: #16A34A;
+      color: #16A34A;
+    }
+    .btn-wishlist {
+      padding: 10px 0;
+      background: transparent;
+      border: 1.5px solid #FFB8C6;
+      border-radius: var(--radius-control);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-wishlist svg {
+      fill: #FF4458;
+      transition: fill .18s;
+    }
+    .btn-wishlist:hover {
+      background: #FFF1F3;
+      border-color: #FF4458;
+      transform: scale(1.05);
+    }
+    .btn-wishlist:active {
+      transform: scale(0.95);
+    }
+    .btn-wishlist.wishlisted {
+      background: #FF4458;
+      border-color: #FF4458;
+    }
+    .btn-wishlist.wishlisted svg {
+      fill: #fff;
+    }
+    .btn-wishlist.wishlisted:hover {
+      background: #E83D50;
+      border-color: #E83D50;
+    }
+
+    /* ── 空态/加载态 ─────────────────────────────────────────── */
+    .state-box {
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .state-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+    .state-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .state-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    /* 加载骨架 */
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .skeleton-card {
+      background: #fff;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    .skeleton-img {
+      width: 100%;
+      aspect-ratio: 1;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .skeleton-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .skeleton-line {
+      height: 14px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .skeleton-line.w-full { width: 100%; }
+    .skeleton-line.w-3-4  { width: 75%; }
+    .skeleton-line.w-1-2  { width: 50%; }
+    .skeleton-line.h-price { height: 28px; }
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to   { background-position: -200% 0; }
+    }
+
+    /* 进度提示 */
+    .loading-platforms {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 14px 18px;
+      background: #fff;
+      border-radius: var(--radius-control);
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .loading-platform-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .platform-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      flex-shrink: 0;
+    }
+    .platform-dot.loading { background: var(--brand-orange); animation: pulse 1s infinite; }
+    .platform-dot.done    { background: #22C55E; }
+
+    /* ── Toast ───────────────────────────────────────────────── */
+    .toast-container {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      padding: 12px 20px;
+      background: #1D2531;
+      color: #fff;
+      border-radius: var(--radius-pill);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      animation: toastIn .25s ease both;
+      pointer-events: auto;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .toast.out { animation: toastOut .25s ease both; }
+    @keyframes toastOut {
+      to { opacity: 0; transform: translateY(8px); }
+    }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    .site-footer {
+      background: #1D2531;
+      color: rgba(255,255,255,.5);
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .site-footer a { color: rgba(255,255,255,.6); text-decoration: none; }
+    .site-footer a:hover { color: #fff; }
+
+    /* ── 水印 ──────────────────────────────────────────────── */
+    .watermark-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .watermark-item {
+      position: absolute;
+      font-size: 52px;
+      opacity: 0.07;
+      transform: rotate(-25deg);
+      user-select: none;
+      white-space: nowrap;
+      color: #999;
+    }
+
+    /* ── 种草悬浮按钮 ──────────────────────────────────────────── */
+    .fab-wishlist {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FF4458 0%, #FF6B7A 100%);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255,68,88,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+      z-index: 999;
+    }
+    .fab-wishlist:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 28px rgba(255,68,88,.5);
+    }
+    .fab-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #EA580C;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      box-shadow: 0 2px 8px rgba(234,88,12,.4);
+    }
+
+    /* ── 种草面板 ──────────────────────────────────────────────── */
+    .wishlist-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all .25s;
+      z-index: 1000;
+    }
+    .wishlist-backdrop.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .wishlist-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 460px;
+      max-width: 90vw;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -4px 0 24px rgba(0,0,0,.15);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1001;
+    }
+    .wishlist-panel.show {
+      transform: translateX(0);
+    }
+    .wishlist-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .wishlist-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .wishlist-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+    .wishlist-close:hover {
+      background: var(--bg-section);
+      color: var(--text-primary);
+    }
+    .wishlist-search {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-section);
+    }
+    .wishlist-search input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      transition: border-color .15s;
+    }
+    .wishlist-search input:focus {
+      border-color: var(--brand);
+    }
+    .wishlist-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    .wishlist-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .wishlist-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      transition: all .2s;
+      position: relative;
+    }
+    .wishlist-item:hover {
+      border-color: var(--brand);
+      box-shadow: 0 2px 12px rgba(255,68,0,.08);
+    }
+    .wishlist-item:hover .wishlist-item-remove {
+      opacity: 1;
+      visibility: visible;
+    }
+    .wishlist-item-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .wishlist-item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .wishlist-item-title {
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--text-primary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .wishlist-item-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #EA580C;
+    }
+    .wishlist-item-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: auto;
+    }
+    .wishlist-item-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .wishlist-item-remove {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.45);
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all .15s;
+    }
+    .wishlist-item-remove:hover {
+      background: #E83D50;
+    }
+    .wishlist-item-btn {
+      flex: 1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      border: none;
+    }
+    .wishlist-item-btn.primary {
+      background: var(--gradient-cta);
+      color: #fff;
+    }
+    .wishlist-item-btn.primary:hover {
+      opacity: .9;
+    }
+    .wishlist-item-btn.secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .wishlist-item-btn.secondary:hover {
+      background: var(--bg-section);
+    }
+    .platform-chip {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ── 响应式 ──────────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .cards-grid, .skeleton-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .hero { padding: 48px 0 40px; }
+      .cards-grid, .skeleton-grid { grid-template-columns: 1fr; }
+      .results-toolbar { flex-direction: column; align-items: flex-start; }
+      .price-actual { font-size: 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">
+      <span class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <path d="M11 7v8M7 11h8"/>
+        </svg>
+      </span>
+      比价宝
+    </a>
+    <p class="header-tip">已接入 <span>5</span> 大主流平台 · 实时比价</p>
+  </div>
+</header>
+
+<!-- ── Hero ────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      实时抓取 · 全网比价 · 帮你省钱
+    </div>
+
+    <h1>全网比价，一搜就省<br><em>更多钱</em></h1>
+    <p class="hero-desc">覆盖淘宝、京东、拼多多、抖音等 9 大平台，<br>价格透明，优惠看得见。</p>
+
+    <!-- 搜索框 -->
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <input
+          class="search-input"
+          type="text"
+          id="searchInput"
+          placeholder="搜索商品名称，如：AirPods Pro、洗面奶、运动鞋…"
+          autocomplete="off"
+        >
+        <button class="search-btn" id="searchBtn" onclick="doSearch()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          立即比价
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── 结果区 ────────────────────────────────────────────────── -->
+<section class="results-section" id="resultsSection">
+  <div class="container">
+
+    <!-- 空态 -->
+    <div class="state-box" id="emptyState">
+      <div class="state-icon">🔍</div>
+      <div class="state-title">搜索你想买的商品</div>
+      <div class="state-desc">输入商品名称，比价 5 大平台，找到最低价</div>
+    </div>
+
+    <!-- 加载中 -->
+    <div id="loadingState" style="display:none">
+      <div class="loading-platforms" id="platformProgress"></div>
+      <div class="skeleton-grid" id="skeletonGrid"></div>
+    </div>
+
+    <!-- 结果 -->
+    <div id="resultsState" style="display:none">
+      <div class="results-toolbar">
+        <div class="results-count">
+          共找到 <strong id="totalCount">0</strong> 件商品
+          <span id="searchKeywordLabel" style="color:var(--text-tertiary)"></span>
+        </div>
+        <div class="sort-tabs">
+          <button class="sort-tab active" onclick="sortCards('price')">💰 价格最低</button>
+          <button class="sort-tab" onclick="sortCards('sales')">🔥 销量最高</button>
+          <button class="sort-tab" onclick="sortCards('coupon')">🎟️ 优惠最大</button>
+        </div>
+      </div>
+      <!-- 平台筛选 chip（结果加载后显示，点击纯前端过滤） -->
+      <div id="platformChips" style="display:none; flex-wrap:wrap; gap:8px; margin-bottom:20px; align-items:center;">
+        <span style="font-size:13px; color:var(--text-secondary); margin-right:4px;">平台筛选：</span>
+        <button class="chip active" data-source="all">全部</button>
+        <button class="chip" data-source="1" >🛍️ 淘宝/天猫</button>
+        <button class="chip" data-source="2" >🔴 京东</button>
+        <button class="chip" data-source="3" >🧡 拼多多</button>
+        <button class="chip" data-source="7" >🎵 抖音</button>
+        <button class="chip" data-source="8" >🟠 快手</button>
+      </div>
+      <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Footer ──────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <p>比价宝 · 数据来自淘宝、京东、拼多多、抖音、快手实时接口 · 仅供参考</p>
+  <p style="margin-top:4px">价格可能因时间、地区、活动而有所不同，请以平台实际页面为准</p>
+</footer>
+
+<!-- Toast 容器 -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- 水印 -->
+<div class="watermark-container" aria-hidden="true">
+  <div class="watermark-item" style="top:5%;left:5%">💰</div>
+  <div class="watermark-item" style="top:5%;left:30%">💰</div>
+  <div class="watermark-item" style="top:5%;left:58%">💰</div>
+  <div class="watermark-item" style="top:5%;right:5%">💰</div>
+  <div class="watermark-item" style="top:20%;left:18%">💰</div>
+  <div class="watermark-item" style="top:20%;left:45%">💰</div>
+  <div class="watermark-item" style="top:20%;right:15%">💰</div>
+  <div class="watermark-item" style="top:35%;left:5%">💰</div>
+  <div class="watermark-item" style="top:35%;left:33%">💰</div>
+  <div class="watermark-item" style="top:35%;left:62%">💰</div>
+  <div class="watermark-item" style="top:35%;right:4%">💰</div>
+  <div class="watermark-item" style="top:50%;left:20%">💰</div>
+  <div class="watermark-item" style="top:50%;left:48%">💰</div>
+  <div class="watermark-item" style="top:50%;right:12%">💰</div>
+  <div class="watermark-item" style="top:65%;left:7%">💰</div>
+  <div class="watermark-item" style="top:65%;left:36%">💰</div>
+  <div class="watermark-item" style="top:65%;left:65%">💰</div>
+  <div class="watermark-item" style="top:65%;right:5%">💰</div>
+  <div class="watermark-item" style="top:80%;left:22%">💰</div>
+  <div class="watermark-item" style="top:80%;left:50%">💰</div>
+  <div class="watermark-item" style="top:80%;right:18%">💰</div>
+  <div class="watermark-item" style="top:92%;left:8%">💰</div>
+  <div class="watermark-item" style="top:92%;left:40%">💰</div>
+  <div class="watermark-item" style="top:92%;right:8%">💰</div>
+</div>
+
+<!-- 种草悬浮按钮 -->
+<button class="fab-wishlist" id="fabWishlist" onclick="toggleWishlistPanel()">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+  </svg>
+  <span class="fab-badge" id="fabBadge" style="display:none">0</span>
+</button>
+
+<!-- 种草面板 -->
+<div class="wishlist-panel" id="wishlistPanel">
+  <div class="wishlist-header">
+    <h3>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF4458" stroke="none" style="vertical-align:-3px;margin-right:6px">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+      我的种草清单
+      <span id="wishlistCount" style="font-size:13px;font-weight:400;color:var(--text-tertiary);margin-left:6px"></span>
+    </h3>
+    <button class="wishlist-close" onclick="toggleWishlistPanel()">✕</button>
+  </div>
+  <div class="wishlist-search">
+    <input type="text" id="wishlistSearchInput" placeholder="搜索种草商品…" oninput="renderWishlist()" />
+  </div>
+  <div class="wishlist-body" id="wishlistBody">
+    <div class="wishlist-empty">
+      <div style="font-size:48px;margin-bottom:12px">🛒</div>
+      <div style="color:var(--text-secondary)">还没有种草商品</div>
+      <div style="color:var(--text-tertiary);font-size:13px;margin-top:4px">喜欢的商品点击心形图标收藏起来</div>
+    </div>
+  </div>
+</div>
+<div class="wishlist-backdrop" id="wishlistBackdrop" onclick="toggleWishlistPanel()"></div>
+
+<script>
+// ── 状态 ─────────────────────────────────────────────────────
+const API_BASE = 'http://127.0.0.1:8765';
+const SOURCE_MAP = {
+  '1':  { name: '淘宝/天猫', cls: 'platform-tb' },
+  '2':  { name: '京东',      cls: 'platform-jd' },
+  '3':  { name: '拼多多',    cls: 'platform-pdd' },
+  '7':  { name: '抖音',      cls: 'platform-dy' },
+  '8':  { name: '快手',      cls: 'platform-ks' },
+};
+const VALID_SOURCES = '1,2,3,7,8';
+
+let allProducts = [];
+let currentSort = 'price';
+let currentSSE = null;
+
+// ── 平台筛选（结果区，纯前端过滤）───────────────────────────
+// 用原生 button，绑一次 click，不依赖任何外部状态
+document.getElementById('platformChips').addEventListener('click', function(e) {
+  const btn = e.target.closest('button.chip');
+  if (!btn) return;
+  // 切换选中态
+  [...this.querySelectorAll('button.chip')].forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 过滤渲染
+  filterAndRender();
+});
+
+function getSelectedSource() {
+  const active = document.querySelector('#platformChips button.chip.active');
+  return active ? active.dataset.source : 'all';
+}
+
+function filterAndRender() {
+  const src = getSelectedSource();
+  const filtered = src === 'all'
+    ? allProducts
+    : allProducts.filter(p => String(p.source) === src);
+  document.getElementById('totalCount').textContent = filtered.length;
+  renderCards(sortProducts(filtered, currentSort));
+}
+
+// ── 搜索（固定拉全部平台数据，source=0）──────────────────────
+function doSearch() {
+  const kw = document.getElementById('searchInput').value.trim();
+  if (!kw) { showToast('请输入搜索关键词'); return; }
+
+  if (currentSSE) { currentSSE.close(); currentSSE = null; }
+
+  allProducts = [];
+  currentSort = 'price';
+  document.querySelectorAll('.sort-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  // 重置平台筛选到"全部"
+  document.getElementById('platformChips').style.display = 'none';
+  [...document.querySelectorAll('#platformChips button.chip')].forEach((b, i) => {
+    b.classList.toggle('active', i === 0); // 第0个是"全部"
+  });
+
+  showLoadingState(kw);
+
+  const url = `${API_BASE}/api/search?keyword=${encodeURIComponent(kw)}&sources=${VALID_SOURCES}`;
+  const es = new EventSource(url);
+  currentSSE = es;
+
+  es.onmessage = (e) => {
+    if (e.data === '[DONE]') {
+      es.close();
+      currentSSE = null;
+      finalizeResults(kw);
+      return;
+    }
+    try {
+      const payload = JSON.parse(e.data);
+      markPlatformDone(payload.source);
+      allProducts.push(...payload.items);
+      filterAndRender();
+      if (allProducts.length > 0) showResultsState();
+    } catch (_) {}
+  };
+
+  es.onerror = () => {
+    es.close();
+    currentSSE = null;
+    if (allProducts.length === 0) {
+      showEmptyState('❌', '获取失败', '无法连接比价服务，请确认后端已启动');
+    } else {
+      finalizeResults(kw);
+    }
+  };
+}
+
+// ── 状态切换 ──────────────────────────────────────────────────
+function showLoadingState(kw) {
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsState').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+
+  // 进度条：显示全部9个平台
+  const allSources = Object.keys(SOURCE_MAP);
+  const prog = document.getElementById('platformProgress');
+  prog.innerHTML = '<span style="font-size:13px;color:var(--text-secondary);margin-right:4px">正在搜索：</span>' +
+    allSources.map(s => {
+      const info = SOURCE_MAP[s] || { name: s };
+      return `<span class="loading-platform-item" id="prog-${s}">
+        <span class="platform-dot loading" id="dot-${s}"></span>${info.name}
+      </span>`;
+    }).join('');
+
+  // 骨架屏
+  const grid = document.getElementById('skeletonGrid');
+  grid.innerHTML = Array(6).fill(0).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line w-full"></div>
+        <div class="skeleton-line w-3-4"></div>
+        <div class="skeleton-line h-price w-1-2"></div>
+        <div class="skeleton-line w-full" style="height:8px;margin-top:4px"></div>
+        <div class="skeleton-line w-full" style="height:36px;border-radius:12px;margin-top:4px"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showResultsState() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsState').style.display = 'block';
+  document.getElementById('platformChips').style.display = 'flex';
+}
+
+function showEmptyState(icon, title, desc) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('resultsState').style.display = 'none';
+  document.getElementById('platformChips').style.display = 'none';
+  const s = document.getElementById('emptyState');
+  s.innerHTML = `<div class="state-icon">${icon}</div>
+    <div class="state-title">${title}</div>
+    <div class="state-desc">${desc}</div>`;
+  s.style.display = 'block';
+}
+
+function markPlatformDone(source) {
+  const dot = document.getElementById('dot-' + source);
+  if (dot) { dot.classList.remove('loading'); dot.classList.add('done'); }
+}
+
+function finalizeResults(kw) {
+  if (allProducts.length === 0) {
+    showEmptyState('🤷', '没有找到相关商品', '试试其他关键词');
+  } else {
+    showResultsState();
+    filterAndRender();
+  }
+}
+
+function updateCount(n) {
+  document.getElementById('totalCount').textContent = n;
+}
+
+// ── 渲染卡片 ──────────────────────────────────────────────────
+function renderCards(products) {
+  const grid = document.getElementById('cardsGrid');
+  if (!grid) return;
+
+  updateCount(products.length);
+
+  // 找最低价用于计算对比条
+  const prices = products.map(p => parseFloat(p.actualPrice)).filter(v => !isNaN(v) && v > 0);
+  const minPrice = prices.length ? Math.min(...prices) : 0;
+  const maxPrice = prices.length ? Math.max(...prices) : 1;
+
+  grid.innerHTML = products.map((p, i) => buildCard(p, i + 1, minPrice, maxPrice)).join('');
+  syncWishlistButtons();
+}
+
+function buildCard(p, rank, minPrice, maxPrice) {
+  const actual   = parseFloat(p.actualPrice)   || 0;
+  const original = parseFloat(p.originalPrice) || 0;
+  const coupon   = parseFloat(p.couponPrice)   || 0;
+  const sales    = p.monthSales || '';
+  const source   = String(p.source || '1');
+  const info     = SOURCE_MAP[source] || { name: '其他', cls: 'platform-tb' };
+
+  const save = original > actual ? (original - actual).toFixed(2) : 0;
+  const barPct = maxPrice > minPrice
+    ? Math.max(10, Math.round(100 - (actual - minPrice) / (maxPrice - minPrice) * 90))
+    : 100;
+  const isLowest = actual === minPrice && actual > 0;
+
+  // 徽章
+  let badgeHtml = '';
+  if (rank === 1) badgeHtml = `<span class="rank-badge rank-1">1</span>`;
+  else if (rank === 2) badgeHtml = `<span class="rank-badge rank-2">2</span>`;
+  else if (rank === 3) badgeHtml = `<span class="rank-badge rank-3">3</span>`;
+  else if (rank <= 9) badgeHtml = `<span class="rank-badge rank-n">${rank}</span>`;
+
+  // 图片
+  const imgHtml = p.picUrl
+    ? `<img class="card-img" src="${escHtml(p.picUrl)}" alt="${escHtml(p.title)}" loading="lazy" onerror="this.style.display='none'">`
+    : `<div class="card-img-placeholder"><svg width="40" height="40" fill="none" stroke="#ccc" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
+  // 标签
+  let tags = '';
+  if (coupon > 0) tags += `<span class="tag tag-coupon">🎟️ 券${coupon}元</span>`;
+  if (save > 0)   tags += `<span class="tag tag-commission">省 ¥${save}</span>`;
+  if (sales)      tags += `<span class="tag tag-sales">🔥 月销${formatSales(sales)}</span>`;
+
+  return `
+  <article class="product-card" data-actual="${actual}" data-sales="${parseSales(sales)}" data-coupon="${coupon}" style="animation-delay:${Math.min((rank-1)*0.05, 0.4)}s">
+    ${badgeHtml}
+    <span class="platform-badge ${info.cls}">${info.name}</span>
+    ${imgHtml}
+    <div class="card-body">
+      <h3 class="card-title">${escHtml(p.title)}</h3>
+
+      <div class="card-price-row">
+        <span class="price-actual"><span class="currency">¥</span>${actual > 0 ? actual.toFixed(2) : '—'}</span>
+        ${original > actual ? `<span class="price-original">¥${original.toFixed(2)}</span>` : ''}
+        ${isLowest ? `<span class="price-save">最低价</span>` : (save > 0 ? `<span class="price-save">省¥${save}</span>` : '')}
+      </div>
+
+      ${actual > 0 ? `
+      <div class="price-bar-wrap">
+        <div class="price-bar-label">
+          <span>${isLowest ? '🟢 全网最低' : '价格对比'}</span>
+          <span style="color:${isLowest?'#16A34A':'var(--text-tertiary)'}">¥${actual.toFixed(2)}</span>
+        </div>
+        <div class="price-bar-track">
+          <div class="price-bar-fill ${isLowest ? 'lowest' : ''}" style="width:${barPct}%"></div>
+        </div>
+      </div>` : ''}
+
+      ${tags ? `<div class="card-tags">${tags}</div>` : ''}
+
+      <div class="card-actions" style="${['7','8'].includes(source) ? 'grid-template-columns:1fr 1fr' : 'grid-template-columns:1fr 1fr 1fr'}">
+        ${!['7','8'].includes(source) ? `
+        <button class="btn-buy" onclick="openBuyUrl('${escHtml(p.goodsId)}','${source}',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          立即购买
+        </button>` : ''}
+        <button class="btn-copy" onclick="copyToken('${escHtml(p.goodsId)}','${source}',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          复制口令
+        </button>
+        <button class="btn-wishlist${wishlist.some(w => w.goodsId === p.goodsId && String(w.source) === source) ? ' wishlisted' : ''}"
+          data-goods-id="${escHtml(p.goodsId)}" data-source="${source}"
+          onclick="addToWishlist(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </article>`;
+}
+
+// ── 立即购买 ─────────────────────────────────────────────────
+async function openBuyUrl(goodsId, source, btn) {
+  const win = window.open('', '_blank');
+  if (!win) { showToast('浏览器拦截了弹窗，请允许本站弹出窗口后重试'); return; }
+
+  btn.textContent = '跳转中…';
+  btn.disabled = true;
+
+  try {
+    const data = await fetchDetail(goodsId, source);
+    let url = '';
+
+    if (String(source) === '2') {
+      // 京东：buyUrl 会被拦截，改为用标题跳搜索结果页
+      const title = data.title || data.detail && data.detail.title || '';
+      url = `https://search.jd.com/Search?keyword=${encodeURIComponent(title)}`;
+    } else {
+      url = data.buyUrl || '';
+    }
+
+    if (url) {
+      win.location.href = url;
+    } else {
+      win.close();
+      showToast('暂无 PC 购买链接，请复制口令到 App 购买');
+    }
+  } catch (e) {
+    win.close();
+    showToast('获取购买链接失败，请重试');
+  } finally {
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> 立即购买`;
+    btn.disabled = false;
+  }
+}
+
+// ── Detail 缓存（仅供复制口令使用）──────────────────────────
+const detailCache = {};
+async function fetchDetail(goodsId, source) {
+  const key = `${source}:${goodsId}`;
+  if (detailCache[key]) return detailCache[key];
+  const res = await fetch(`${API_BASE}/api/detail?id=${encodeURIComponent(goodsId)}&source=${encodeURIComponent(source)}`);
+  const data = await res.json();
+  detailCache[key] = data;
+  return data;
+}
+
+// ── 复制口令 ──────────────────────────────────────────────────
+async function copyToken(goodsId, source, btn) {
+  if (btn.classList.contains('copied')) return;
+  btn.textContent = '获取中…';
+  btn.disabled = true;
+  try {
+    const data = await fetchDetail(goodsId, source);
+    const token = data.copyText || data.buyUrl || '';
+    if (token) {
+      await navigator.clipboard.writeText(token);
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制`;
+      btn.classList.add('copied');
+      showToast('口令已复制，打开 App 粘贴即可购买 🎉');
+      setTimeout(() => {
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> 复制口令`;
+        btn.classList.remove('copied');
+        btn.disabled = false;
+      }, 3000);
+    } else {
+      showToast('暂无购买口令');
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> 复制口令`;
+      btn.disabled = false;
+    }
+  } catch (err) {
+    showToast('获取口令失败，请重试');
+    btn.innerHTML = `复制口令`;
+    btn.disabled = false;
+  }
+}
+
+// ── 排序 ──────────────────────────────────────────────────────
+function sortCards(type) {
+  currentSort = type;
+  document.querySelectorAll('.sort-tab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('onclick') === `sortCards('${type}')`);
+  });
+  filterAndRender();
+}
+
+function sortProducts(products, type) {
+  const arr = [...products];
+  if (type === 'price') {
+    arr.sort((a, b) => (parseFloat(a.actualPrice)||99999) - (parseFloat(b.actualPrice)||99999));
+  } else if (type === 'sales') {
+    arr.sort((a, b) => parseSales(b.monthSales) - parseSales(a.monthSales));
+  } else if (type === 'coupon') {
+    arr.sort((a, b) => (parseFloat(b.couponPrice)||0) - (parseFloat(a.couponPrice)||0));
+  }
+  return arr;
+}
+
+// ── 工具 ──────────────────────────────────────────────────────
+function parseSales(s) {
+  if (!s) return 0;
+  s = String(s).replace(/,/g, '');
+  if (s.includes('万')) return parseFloat(s) * 10000;
+  return parseFloat(s) || 0;
+}
+function formatSales(s) {
+  if (!s) return '';
+  const n = parseSales(s);
+  if (n >= 10000) return (n/10000).toFixed(1) + '万';
+  return String(s);
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('out');
+    el.addEventListener('animationend', () => el.remove());
+  }, 2600);
+}
+
+// ── 回车搜索 ──────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+// ── 种草功能 ──────────────────────────────────────────────────
+let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+
+function addToWishlist(product) {
+  const already = wishlist.some(p => p.goodsId === product.goodsId && p.source === product.source);
+  // 去重：同一商品只保留最新一次种草
+  wishlist = wishlist.filter(p => !(p.goodsId === product.goodsId && p.source === product.source));
+  if (!already) {
+    wishlist.unshift({ ...product, addedAt: Date.now() });
+    saveWishlist();
+    showToast('已添加到种草清单');
+  } else {
+    // 再次点击取消种草
+    saveWishlist();
+    showToast('已取消种草');
+  }
+  // 同步当前卡片按钮状态
+  syncWishlistButtons();
+}
+
+function saveWishlist() {
+  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  updateWishlistBadge();
+}
+
+function updateWishlistBadge() {
+  const badge = document.getElementById('fabBadge');
+  const countEl = document.getElementById('wishlistCount');
+  if (wishlist.length > 0) {
+    badge.textContent = wishlist.length;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+  if (countEl) countEl.textContent = wishlist.length > 0 ? `共 ${wishlist.length} 件` : '';
+}
+
+function toggleWishlistPanel() {
+  const panel = document.getElementById('wishlistPanel');
+  const backdrop = document.getElementById('wishlistBackdrop');
+  const isOpen = panel.classList.contains('show');
+
+  if (isOpen) {
+    panel.classList.remove('show');
+    backdrop.classList.remove('show');
+  } else {
+    renderWishlist();
+    panel.classList.add('show');
+    backdrop.classList.add('show');
+  }
+}
+
+function renderWishlist() {
+  const body = document.getElementById('wishlistBody');
+  const countEl = document.getElementById('wishlistCount');
+  const searchInput = document.getElementById('wishlistSearchInput');
+  const keyword = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+  // 搜索过滤
+  let filtered = wishlist;
+  if (keyword) {
+    filtered = wishlist.filter(p => (p.title || '').toLowerCase().includes(keyword));
+  }
+
+  // 更新总数
+  if (countEl) {
+    countEl.textContent = wishlist.length > 0 ? `共 ${wishlist.length} 件` : '';
+  }
+
+  if (filtered.length === 0) {
+    body.innerHTML = `
+      <div class="wishlist-empty">
+        <div style="font-size:48px;margin-bottom:12px">${keyword ? '🔍' : '🛒'}</div>
+        <div style="color:var(--text-secondary)">${keyword ? '没有找到相关商品' : '还没有种草商品'}</div>
+        <div style="color:var(--text-tertiary);font-size:13px;margin-top:4px">${keyword ? '试试其他关键词' : '喜欢的商品点击心形图标收藏起来'}</div>
+      </div>`;
+    return;
+  }
+
+  body.innerHTML = filtered.map((p) => {
+    const originalIdx = wishlist.indexOf(p);
+    const source = String(p.source || '1');
+    const info = SOURCE_MAP[source] || { name: '其他', cls: 'platform-tb' };
+    const d = new Date(p.addedAt);
+    const addedTime = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}种草`;
+    const isDyKs = source === '7' || source === '8';
+
+    return `
+      <div class="wishlist-item">
+        <button class="wishlist-item-remove" onclick="removeFromWishlist(${originalIdx})">✕</button>
+        <img src="${escHtml(p.picUrl)}" class="wishlist-item-img" alt="">
+        <div class="wishlist-item-info">
+          <div class="wishlist-item-title">${escHtml(p.title || '')}</div>
+          <div class="wishlist-item-price">¥${parseFloat(p.actualPrice || 0).toFixed(2)}</div>
+          <div class="wishlist-item-meta">
+            <span class="platform-chip ${info.cls}">${info.name}</span>
+            · ${addedTime}
+          </div>
+          <div class="wishlist-item-actions">
+            ${isDyKs ? '' : `<button class="wishlist-item-btn primary" onclick="buyFromWishlist(${originalIdx})">立即购买</button>`}
+            <button class="wishlist-item-btn secondary" onclick="copyWishlistToken(${originalIdx}, this)">复制口令</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function buyFromWishlist(idx) {
+  const p = wishlist[idx];
+  if (!p) return;
+  toggleWishlistPanel();
+  const btn = document.createElement('button');
+  openBuyUrl(p.goodsId, p.source, btn);
+}
+
+async function copyWishlistToken(idx, btn) {
+  const p = wishlist[idx];
+  if (!p) return;
+  const orig = btn.textContent;
+  btn.textContent = '复制中…';
+  btn.disabled = true;
+  try {
+    const data = await fetchDetail(p.goodsId, p.source);
+    const text = data.copyText || data.title || '';
+    if (!text) { showToast('暂无口令'); return; }
+    await navigator.clipboard.writeText(text);
+    btn.textContent = '已复制！';
+    showToast('口令已复制，打开 App 粘贴即可');
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
+  } catch {
+    btn.textContent = orig;
+    btn.disabled = false;
+    showToast('复制失败，请手动操作');
+  }
+}
+
+function removeFromWishlist(idx) {
+  wishlist.splice(idx, 1);
+  saveWishlist();
+  renderWishlist();
+  syncWishlistButtons();
+  showToast('已移除');
+}
+
+function syncWishlistButtons() {
+  document.querySelectorAll('.btn-wishlist').forEach(btn => {
+    const goodsId = btn.dataset.goodsId;
+    const source = btn.dataset.source;
+    if (!goodsId) return;
+    const isWishlisted = wishlist.some(p => p.goodsId === goodsId && String(p.source) === source);
+    btn.classList.toggle('wishlisted', isWishlisted);
+  });
+}
+
+// 页面加载时更新徽章
+updateWishlistBadge();
+
+</script>
+</body>
+</html>
